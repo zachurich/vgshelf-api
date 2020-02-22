@@ -1,1 +1,1 @@
-# vgshelf-api
+# Express REST api for vgshelf.co
