@@ -4,6 +4,7 @@ const { IGDB_ENDPOINTS } = require("./constants");
 
 const Cover = async (req, res, next) => {
   const { gameId } = req.body; // game id
+
   let response;
   const query = constructCoverQuery(gameId);
   try {

@@ -11,6 +11,7 @@ const Health = require("../resolvers/health");
 const Search = require("../resolvers/igdbApi/search");
 const Cover = require("../resolvers/igdbApi/cover");
 const { apiBase } = require("./constants");
+const { jwtCheck } = require("../../common/globalUtils");
 
 const api = express.Router();
 
@@ -19,14 +20,14 @@ api.get(`${apiBase}/health`, Health);
 
 /** Games */
 api.get(`${apiBase}/game`, GetGame);
-api.post(`${apiBase}/game`, SaveGame);
-api.delete(`${apiBase}/game`, RemoveGame);
+api.post(`${apiBase}/game`, jwtCheck, SaveGame);
+api.delete(`${apiBase}/game`, jwtCheck, RemoveGame);
 
 /** Collections */
 api.get(`${apiBase}/collection`, GetCollection);
-api.post(`${apiBase}/collection`, CreateCollection);
-api.put(`${apiBase}/collection`, UpdateCollection);
-api.delete(`${apiBase}/collection`, DeleteCollection);
+api.post(`${apiBase}/collection`, jwtCheck, CreateCollection);
+api.put(`${apiBase}/collection`, jwtCheck, UpdateCollection);
+api.delete(`${apiBase}/collection`, jwtCheck, DeleteCollection);
 
 /** igdb stuff */
 api.post(`${apiBase}/external/search/`, Search);

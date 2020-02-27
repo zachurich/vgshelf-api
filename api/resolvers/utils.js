@@ -9,7 +9,6 @@ createResponse = (msg, data, code = 200) => {
 };
 
 handleResponse = (res, response, redirect = false) => {
-  console.log(response);
   const { code } = response;
   if (code >= 500 && code < 600) {
     res.status(code);
