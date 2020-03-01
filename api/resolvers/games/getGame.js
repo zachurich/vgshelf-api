@@ -24,7 +24,7 @@ const GetGame = async (req, res) => {
       return handleResponse(res, response);
     }
 
-    if (userName && !collectionId) {
+    if (userName) {
       // Get all games via unauthed username
       query = await handleErrors(buildQueryGamesByUsername(userName));
       response = await handleErrors(retrieveAllGames(query));
