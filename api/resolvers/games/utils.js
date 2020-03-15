@@ -2,7 +2,7 @@ const { createResponse } = require("../utils");
 
 exports.createDetailedGame = (globalGame, userGame) => {
   return {
-    id: `${globalGame._id}`,
+    id: `${userGame._id}`,
     title: globalGame.title,
     imageUrl: globalGame.imageUrl,
     added: userGame.added,

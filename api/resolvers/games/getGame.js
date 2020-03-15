@@ -1,4 +1,4 @@
-const uniqBy = require("lodash/uniqBy");
+const _ = require("lodash");
 const User = require("../../models/User");
 const Game = require("../../models/Game");
 const Collection = require("../../models/Collection");
@@ -9,11 +9,11 @@ const { handleResponse, createResponse, handleErrors } = require("../utils");
  * @field gameId (Required)- Game Unique ID from mongo collection
  *
  * @field userId (Optional) - ID of user in mongodb to get all games from
- * @field collectionId (Optional) - Collection Unique ID from mongodb collection
+ * @field collectionSlug (Optional) - Collection Unique ID from mongodb collection
  * @field userName (Optional) - Username for user in mongodb
  */
 const GetGame = async (req, res) => {
-  const { gameId, userId = null, collectionId = null, userName = null } = req.query;
+  const { gameId, userId = null, collectionSlug = null, userName = null } = req.query;
   let response = {};
   let query;
   try {
@@ -24,12 +24,12 @@ const GetGame = async (req, res) => {
       return handleResponse(res, response);
     }
 
-    if (userName) {
+    if (userName && !collectionSlug) {
       // Get all games via unauthed username
       query = await handleErrors(buildQueryGamesByUsername(userName));
       response = await handleErrors(retrieveAllGames(query));
-    } else if (collectionId) {
-      query = await handleErrors(buildQueryGamesInCollection(collectionId));
+    } else if (userName && collectionSlug) {
+      query = await handleErrors(buildQueryGamesInCollection(userName, collectionSlug));
     } else if (userId) {
       query = await handleErrors(buildQueryGamesInUser(userId));
     } else {
@@ -42,22 +42,23 @@ const GetGame = async (req, res) => {
   return handleResponse(res, response);
 };
 
-async function buildQueryGamesInCollection(collection) {
+async function buildQueryGamesInCollection(userName, collectionSlug) {
   const type = "collection";
-  const queryObject = await Collection.findOne({ _id: collection });
-  return { queryObject, type, user: queryObject.user };
+  const mongoUser = await User.findOne({ username: userName });
+  const collection = _.find(mongoUser.collections, ["slug", collectionSlug]);
+  return { queryObject: collection, type, user: mongoUser };
 }
 
 async function buildQueryGamesInUser(user) {
   const type = "user";
-  const queryObject = await User.findOne({ userId: user });
-  return { queryObject, type, user: queryObject.id };
+  const mongoUser = await User.findOne({ userId: user });
+  return { queryObject: mongoUser, type, user: mongoUser };
 }
 
-async function buildQueryGamesByUsername(username) {
+async function buildQueryGamesByUsername(userName) {
   const type = "userName";
-  const queryObject = await User.findOne({ username });
-  return { queryObject, type, user: queryObject.id };
+  const mongoUser = await User.findOne({ username: userName });
+  return { queryObject: mongoUser, type, user: mongoUser };
 }
 
 async function retrieveSingleGame(filter) {
@@ -69,14 +70,13 @@ async function retrieveAllGames({ queryObject, type, user }) {
   const { games } = queryObject;
   const gameDetails = [];
   for (const userGame of games) {
-    let globalGame = await Game.findOne({ _id: userGame._id });
+    let globalGame = await Game.findOne({ _id: userGame.refId });
     gameDetails.push(createDetailedGame(globalGame, userGame));
   }
   try {
-    const { username } = await User.findOne({ _id: user });
     return createResponse(`Retrieved all games from ${type}!`, {
-      username,
-      games: uniqBy(gameDetails, "id")
+      username: user.username,
+      games: _.uniqBy(gameDetails, "id")
     });
   } catch (error) {
     throw Error("User not found!", error);

@@ -2,33 +2,23 @@ const _ = require("lodash");
 const Collection = require("../../models/Collection");
 const Game = require("../../models/Game");
 const User = require("../../models/User");
-const {
-  retrieveCollection,
-  retrieveAllCollections,
-  createDetailedCollection
-} = require("./utils");
 const { handleResponse, createResponse, handleErrors } = require("../utils");
 
 // collectionId: (Optional - Returns single collection)
 // userId: (Optional - Returns all collections for user)
 const GetCollection = async (req, res) => {
-  const { collectionId, userId = null, userName = null } = req.query;
+  const { collectionSlug, userName = null } = req.query;
   let response = {};
   try {
-    if (!userId) {
-      if (userName) {
-        // Get all collections via unauthed username
-        const collectionFilter = await handleErrors(
-          buildQueryCollectionsByUsername(userName)
-        );
-        response = await handleErrors(retrieveAllDetailedCollections(collectionFilter));
-      } else if (collectionId) {
-        const collectionFilter = { _id: collectionId };
-        response = await handleErrors(retrieveSingleDetailedCollection(collectionFilter));
-      }
-    } else {
-      const collectionFilter = await handleErrors(buildQueryCollectionsInUser(userId));
-      response = await handleErrors(retrieveAllDetailedCollections(collectionFilter));
+    if (userName && !collectionSlug) {
+      // Get all collections via unauthed username
+      const mongoUser = await User.findOne({ username: userName });
+      response = await handleErrors(retrieveAllDetailedCollections(mongoUser));
+    } else if (userName && collectionSlug) {
+      const mongoUser = await User.findOne({ username: userName });
+      response = await handleErrors(
+        retrieveSingleDetailedCollection(mongoUser, collectionSlug)
+      );
     }
   } catch (error) {
     response = createResponse(
@@ -40,19 +30,9 @@ const GetCollection = async (req, res) => {
   return handleResponse(res, response);
 };
 
-const buildQueryCollectionsByUsername = async userName => {
-  const mongoUser = await User.findOne({ username: userName });
-  return { user: mongoUser._id };
-};
-
-const buildQueryCollectionsInUser = async userId => {
-  const mongoUser = await User.findOne({ userId });
-  return { user: mongoUser._id };
-};
-
-const retrieveSingleDetailedCollection = async collectionFilter => {
+const retrieveSingleDetailedCollection = async (mongoUser, collectionSlug) => {
   try {
-    const currentCollection = await retrieveCollection(collectionFilter);
+    const currentCollection = await retrieveCollection(mongoUser, collectionSlug);
     const gameDetails = await retrieveGamesInCollection(currentCollection);
     const detailedCollection = createDetailedCollection(currentCollection, gameDetails);
     response = createResponse(`Retrieved single Collection!`, detailedCollection);
@@ -63,9 +43,9 @@ const retrieveSingleDetailedCollection = async collectionFilter => {
   }
 };
 
-const retrieveAllDetailedCollections = async collectionFilter => {
+const retrieveAllDetailedCollections = async mongoUser => {
   try {
-    const allCollections = await retrieveAllCollections(collectionFilter);
+    const allCollections = await retrieveAllCollections(mongoUser);
     const allDetailedCollections = await composeDetailedCollections(allCollections);
     response = createResponse(
       `Retrieved all Collections for user!`,
@@ -102,6 +82,43 @@ const composeDetailedCollections = async allCollections => {
     allDetailedCollections.push(detailedCollection);
   }
   return allDetailedCollections;
+};
+
+const retrieveCollection = async (mongoUser, collectionSlug) => {
+  try {
+    const currentCollection = _.find(mongoUser.collections, ["slug", collectionSlug]);
+    if (!currentCollection) {
+      error = "Collection not found!";
+      throw error;
+    }
+    return currentCollection;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const retrieveAllCollections = async mongoUser => {
+  try {
+    const allCollections = mongoUser.collections;
+    console.log("ALL COLLECTIONS", allCollections);
+    if (!allCollections) {
+      error = "Collections not found!";
+      throw error;
+    }
+    return allCollections;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const createDetailedCollection = (collection, gameDetails) => {
+  return {
+    id: collection["_id"],
+    title: collection.name,
+    slug: collection.slug,
+    created: collection.created,
+    games: gameDetails
+  };
 };
 
 module.exports = GetCollection;

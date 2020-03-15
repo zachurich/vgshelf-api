@@ -65,7 +65,7 @@ const addGameToUser = async (userId, game, properties) => {
   if (objectHasGame(user, game)) {
     return createResponse("You already have this game!", {}, 400);
   } else {
-    user.games.push({ _id: game._id, properties });
+    user.games.push({ refId: game._id, properties });
     const data = await user.save();
     return createResponse("Game assigned to user!", data);
   }

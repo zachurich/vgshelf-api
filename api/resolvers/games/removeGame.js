@@ -1,5 +1,6 @@
 const User = require("../../models/User");
 const Game = require("../../models/Game");
+const Collection = require("../../models/Collection");
 const { createResponse, handleResponse } = require("../utils");
 
 // {
@@ -13,6 +14,7 @@ const RemoveGame = async (req, res, next) => {
     if (userId) {
       const user = await User.findOne({ userId });
       if (user) {
+        await removeGameFromCollections(user, gameId);
         const data = await removeGameFromUser(user, gameId);
         if (data) {
           response = createResponse("Game removed from user!", data);
@@ -38,6 +40,21 @@ const RemoveGame = async (req, res, next) => {
   }
   return handleResponse(res, response);
 };
+
+async function removeGameFromCollections(user, gameId) {
+  const collections = await Collection.find({ user });
+  collections.forEach(async shelf => {
+    console.log(shelf.games);
+    shelf.games = shelf.games.filter(game => game !== gameId);
+    await shelf.save();
+  });
+  const userGame = user.games.id(gameId);
+  if (userGame) {
+    userGame.remove();
+    const data = await user.save();
+    return data;
+  }
+}
 
 async function removeGameFromUser(user, gameId) {
   const userGame = user.games.id(gameId);
