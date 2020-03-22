@@ -100,7 +100,6 @@ const retrieveCollection = async (mongoUser, collectionSlug) => {
 const retrieveAllCollections = async mongoUser => {
   try {
     const allCollections = mongoUser.collections;
-    console.log("ALL COLLECTIONS", allCollections);
     if (!allCollections) {
       error = "Collections not found!";
       throw error;

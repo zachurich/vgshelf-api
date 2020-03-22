@@ -1,6 +1,8 @@
 const User = require("../../models/User");
 const Game = require("../../models/Game");
 const Collection = require("../../models/Collection");
+const UserGame = require("../../models/UserGame");
+
 const { createResponse, handleResponse, handleErrors } = require("../utils");
 const { objectHasGame, addGameToObj } = require("./utils");
 
@@ -62,13 +64,19 @@ const addGameToCollection = async (collection, game) => {
 
 const addGameToUser = async (userId, game, properties) => {
   const user = await User.findOne({ userId });
-  if (objectHasGame(user, game)) {
-    return createResponse("You already have this game!", {}, 400);
-  } else {
-    user.games.push({ refId: game._id, properties });
-    const data = await user.save();
-    return createResponse("Game assigned to user!", data);
-  }
+  const userGame = new UserGame({
+    refId: game._id,
+    properties,
+    user: user._id
+  });
+  // if (objectHasGame(user, game)) {
+  //   return createResponse("You already have this game!", {}, 400);
+  // } else {
+  await userGame.save();
+  user.games.push(userGame._id);
+  const data = await user.save();
+  return createResponse("Game assigned to user!", data);
+  // }
 };
 
 module.exports = { SaveGame };

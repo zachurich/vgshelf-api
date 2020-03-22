@@ -1,8 +1,8 @@
 const _ = require("lodash");
 const User = require("../../models/User");
 const Game = require("../../models/Game");
-const Collection = require("../../models/Collection");
-const { createDetailedGame } = require("./utils");
+const UserGame = require("../../models/UserGame");
+
 const { handleResponse, createResponse, handleErrors } = require("../utils");
 
 /**
@@ -69,18 +69,29 @@ async function retrieveSingleGame(filter) {
 async function retrieveAllGames({ queryObject, type, user }) {
   const { games } = queryObject;
   const gameDetails = [];
-  for (const userGame of games) {
-    let globalGame = await Game.findOne({ _id: userGame.refId });
-    gameDetails.push(createDetailedGame(globalGame, userGame));
-  }
   try {
+    for (const userGameId of games) {
+      let userGame = await UserGame.findOne({ _id: userGameId });
+      let globalGame = await Game.findOne({ _id: userGame.refId });
+      gameDetails.push(createDetailedGame(globalGame, userGame));
+    }
     return createResponse(`Retrieved all games from ${type}!`, {
       username: user.username,
       games: _.uniqBy(gameDetails, "id")
     });
   } catch (error) {
-    throw Error("User not found!", error);
+    throw Error("Could not retrieve game data!", error);
   }
 }
+
+const createDetailedGame = (globalGame, userGame) => {
+  return {
+    id: `${userGame._id}`,
+    title: globalGame.title,
+    imageUrl: globalGame.imageUrl,
+    added: userGame.added,
+    properties: userGame.properties
+  };
+};
 
 module.exports = GetGame;

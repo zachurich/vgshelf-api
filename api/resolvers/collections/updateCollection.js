@@ -49,12 +49,12 @@ const createModifiedCollection = (mongoUser, games) => {
   const modifiedCollection = [];
   try {
     for (const userGameId of games) {
-      const game = _.find(mongoUser.games, ["id", userGameId]);
-      if (!game) {
+      const foundGame = mongoUser.games.includes(userGameId);
+      if (!foundGame) {
         error = "Game not found! Won't update collection.";
         throw error;
       } else {
-        modifiedCollection.push(game);
+        modifiedCollection.push(...mongoUser.games.filter(id => id == userGameId));
       }
     }
     return modifiedCollection;

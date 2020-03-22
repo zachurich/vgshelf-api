@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const User = require("../../models/User");
 const Game = require("../../models/Game");
 const Collection = require("../../models/Collection");
@@ -15,9 +16,9 @@ const RemoveGame = async (req, res, next) => {
       const user = await User.findOne({ userId });
       if (user) {
         await removeGameFromCollections(user, gameId);
-        const data = await removeGameFromUser(user, gameId);
-        if (data) {
-          response = createResponse("Game removed from user!", data);
+        const removedFromUser = await removeGameFromUser(user, gameId);
+        if (removedFromUser) {
+          response = createResponse("Game removed from user!", {});
         } else {
           response = createResponse("User doesn't have game in collection!", {}, 400);
         }
@@ -42,26 +43,23 @@ const RemoveGame = async (req, res, next) => {
 };
 
 async function removeGameFromCollections(user, gameId) {
-  const collections = await Collection.find({ user });
-  collections.forEach(async shelf => {
-    console.log(shelf.games);
-    shelf.games = shelf.games.filter(game => game !== gameId);
-    await shelf.save();
+  user.collections.forEach(async shelf => {
+    const foundShelfGame = shelf.games.includes(gameId);
+    if (foundShelfGame) {
+      shelf.games = shelf.games.filter(id => id != gameId);
+      console.log(`Removed game from shelf ${shelf.name}`);
+    }
   });
-  const userGame = user.games.id(gameId);
-  if (userGame) {
-    userGame.remove();
-    const data = await user.save();
-    return data;
-  }
+  await user.save();
 }
 
 async function removeGameFromUser(user, gameId) {
-  const userGame = user.games.id(gameId);
-  if (userGame) {
-    userGame.remove();
-    const data = await user.save();
-    return data;
+  const foundGame = user.games.includes(gameId);
+  if (foundGame) {
+    user.games = user.games.filter(id => id != gameId);
+    console.log(`Removed game from ${user.username}`);
+    await user.save();
+    return true;
   }
 }
 
