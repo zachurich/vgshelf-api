@@ -1,6 +1,6 @@
-const User = require("../models/User");
+import User from "../models/User.js";
 
-createResponse = (msg, data, code = 200) => {
+export const createResponse = (msg, data, code = 200) => {
   return {
     msg,
     data,
@@ -8,7 +8,7 @@ createResponse = (msg, data, code = 200) => {
   };
 };
 
-handleResponse = (res, response, redirect = false) => {
+export const handleResponse = (res, response, redirect = false) => {
   const { code } = response;
   if (code >= 500 && code < 600) {
     console.log(response);
@@ -22,7 +22,7 @@ handleResponse = (res, response, redirect = false) => {
   }
 };
 
-userExists = (userId, req, res, next) => {
+export const userExists = (userId, req, res, next) => {
   User.findOne({ userId }, (err, obj) => {
     req.userId = userId;
     if (err) {
@@ -38,7 +38,7 @@ userExists = (userId, req, res, next) => {
   });
 };
 
-handleErrors = async fn => {
+export const handleErrors = async fn => {
   try {
     const response = await fn;
     return response;
@@ -47,7 +47,7 @@ handleErrors = async fn => {
   }
 };
 
-checkAuthentication = (req, res, next) => {
+export const checkAuthentication = (req, res, next) => {
   console.log(req.get("host"));
   if (req.get("host").includes("/api") && !req.isAuthenticated()) {
     res.status(401);
@@ -56,12 +56,4 @@ checkAuthentication = (req, res, next) => {
     );
   }
   next();
-};
-
-module.exports = {
-  createResponse,
-  handleResponse,
-  userExists,
-  handleErrors,
-  checkAuthentication
 };

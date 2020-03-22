@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
-const uniqueRequired = { unique: true, required: true };
-const { PACKAGING, COMPLETENESS } = require("../../common/constants");
+import mongoose from "mongoose";
+import { PACKAGING, COMPLETENESS } from "../../common/constants.js";
 
 // Users need to be able to add custom properties to a game, but we don't want
 // to modify the game for everyone, so users have their own game instance that wraps
@@ -29,4 +28,4 @@ const UserGame = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model("UserGame", UserGame);
+export default mongoose.model("UserGame", UserGame);

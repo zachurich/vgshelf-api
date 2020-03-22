@@ -1,6 +1,6 @@
-const slugify = require("slugify");
-const User = require("../../models/User");
-const { handleResponse, createResponse } = require("../utils");
+import slugify from "slugify";
+import User from "../../models/User.js";
+import { handleResponse, createResponse } from "../utils.js";
 
 const CreateCollection = async (req, res) => {
   const { userId, collectionName, games = [] } = req.body;
@@ -20,4 +20,4 @@ const CreateCollection = async (req, res) => {
   return handleResponse(res, response);
 };
 
-module.exports = CreateCollection;
+export default CreateCollection;

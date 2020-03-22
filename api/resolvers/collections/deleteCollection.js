@@ -1,7 +1,7 @@
-const _ = require("lodash");
-const Collection = require("../../models/Collection");
-const User = require("../../models/User");
-const { handleResponse, createResponse } = require("../utils");
+import _ from "lodash";
+import Collection from "../../models/Collection.js";
+import User from "../../models/User.js";
+import { handleResponse, createResponse } from "../utils.js";
 
 // {
 // 	"collectionId": "",
@@ -37,4 +37,4 @@ async function deleteCollection(collectionId, userId) {
   }
 }
 
-module.exports = DeleteCollection;
+export default DeleteCollection;

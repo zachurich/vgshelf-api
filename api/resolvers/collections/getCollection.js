@@ -1,8 +1,7 @@
-const _ = require("lodash");
-const Collection = require("../../models/Collection");
-const Game = require("../../models/Game");
-const User = require("../../models/User");
-const { handleResponse, createResponse, handleErrors } = require("../utils");
+import _ from "lodash";
+import Game from "../../models/Game.js";
+import User from "../../models/User.js";
+import { handleResponse, createResponse, handleErrors } from "../utils.js";
 
 // collectionId: (Optional - Returns single collection)
 // userId: (Optional - Returns all collections for user)
@@ -120,4 +119,4 @@ const createDetailedCollection = (collection, gameDetails) => {
   };
 };
 
-module.exports = GetCollection;
+export default GetCollection;

@@ -1,11 +1,12 @@
 {
   "name": "vgshelf-api",
   "version": "1.0.0",
+  "type": "module",
   "description": "Node API For vgshelf.co",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
-    "debug": "node --inspect-brk=9229 index.js"
+    "dev": "nodemon --experimental-modules index.js",
+    "debug": "node --experimental-modules --inspect-brk=9229 index.js"
   },
   "author": "Zach Urich",
   "license": "ISC",

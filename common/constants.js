@@ -1,17 +1,17 @@
 // Game Properties
-exports.PACKAGING = {
+export const PACKAGING = {
   GAME_ONLY: "Game Only",
   BOX: "Box",
   MANUAL: "Manual",
   SEALED: "Sealed"
 };
 
-exports.COMPLETENESS = {
+export const COMPLETENESS = {
   STARTED: "Started",
   BEATEN: "Beaten",
   COMPLETED: "Completed"
 };
 
-exports.IMAGES = {
+export const IMAGES = {
   MISSING: "/static/missing-thumb.png"
 };

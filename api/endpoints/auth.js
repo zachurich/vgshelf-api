@@ -1,8 +1,8 @@
-const express = require("express");
-const { InitUser, UserResponseHandler } = require("../resolvers/users/registerUser");
+import express from "express";
+import { InitUser, UserResponseHandler } from "../resolvers/users/registerUser";
 
 const api = express.Router();
 
 api.get("/callback", InitUser, UserResponseHandler);
 
-module.exports = api;
+export default api;

@@ -1,10 +1,10 @@
-const User = require("../../models/User");
-const Game = require("../../models/Game");
-const Collection = require("../../models/Collection");
-const UserGame = require("../../models/UserGame");
+import User from "../../models/User.js";
+import Game from "../../models/Game.js";
+import Collection from "../../models/Collection.js";
+import UserGame from "../../models/UserGame.js";
 
-const { createResponse, handleResponse, handleErrors } = require("../utils");
-const { objectHasGame, addGameToObj } = require("./utils");
+import { createResponse, handleResponse, handleErrors } from "../utils.js";
+import { objectHasGame, addGameToObj } from "./utils.js";
 
 // {
 // 	"userId": "auth0|5d50aaee46c9270eb3b3441d",
@@ -79,4 +79,4 @@ const addGameToUser = async (userId, game, properties) => {
   // }
 };
 
-module.exports = { SaveGame };
+export default SaveGame;

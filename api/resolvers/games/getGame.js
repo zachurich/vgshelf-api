@@ -1,9 +1,9 @@
-const _ = require("lodash");
-const User = require("../../models/User");
-const Game = require("../../models/Game");
-const UserGame = require("../../models/UserGame");
+import _ from "lodash";
+import User from "../../models/User.js";
+import Game from "../../models/Game.js";
+import UserGame from "../../models/UserGame.js";
 
-const { handleResponse, createResponse, handleErrors } = require("../utils");
+import { handleResponse, createResponse, handleErrors } from "../utils.js";
 
 /**
  * @field gameId (Required)- Game Unique ID from mongo collection
@@ -94,4 +94,4 @@ const createDetailedGame = (globalGame, userGame) => {
   };
 };
 
-module.exports = GetGame;
+export default GetGame;

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const uniqueRequired = { unique: true, required: true };
 
 const ShelfSchema = new mongoose.Schema({
@@ -27,4 +27,4 @@ const User = new mongoose.Schema({
   ]
 });
 
-module.exports = mongoose.model("User", User);
+export default mongoose.model("User", User);

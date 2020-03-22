@@ -1,17 +1,17 @@
-const express = require("express");
+import express from "express";
 
-const { SaveGame } = require("../resolvers/games/saveGame");
-const GetGame = require("../resolvers/games/getGame");
-const RemoveGame = require("../resolvers/games/removeGame");
-const GetCollection = require("../resolvers/collections/getCollection");
-const CreateCollection = require("../resolvers/collections/createCollection");
-const UpdateCollection = require("../resolvers/collections/updateCollection");
-const DeleteCollection = require("../resolvers/collections/deleteCollection");
-const Health = require("../resolvers/health");
-const Search = require("../resolvers/igdbApi/search");
-const Cover = require("../resolvers/igdbApi/cover");
-const { apiBase } = require("./constants");
-const { jwtCheck } = require("../../common/globalUtils");
+import SaveGame from "../resolvers/games/saveGame.js";
+import GetGame from "../resolvers/games/getGame.js";
+import RemoveGame from "../resolvers/games/removeGame.js";
+import GetCollection from "../resolvers/collections/getCollection.js";
+import CreateCollection from "../resolvers/collections/createCollection.js";
+import UpdateCollection from "../resolvers/collections/updateCollection.js";
+import DeleteCollection from "../resolvers/collections/deleteCollection.js";
+import Health from "../resolvers/health.js";
+import Search from "../resolvers/igdbApi/search.js";
+import Cover from "../resolvers/igdbApi/cover.js";
+import { apiBase } from "./constants.js";
+import { jwtCheck } from "../../common/globalUtils.js";
 
 const api = express.Router();
 
@@ -33,4 +33,4 @@ api.delete(`${apiBase}/collection`, jwtCheck, DeleteCollection);
 api.post(`${apiBase}/external/search/`, Search);
 api.post(`${apiBase}/external/cover/`, Cover);
 
-module.exports = api;
+export default api;

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const Game = new mongoose.Schema({
   title: { type: String, unique: true, required: "Title cannot be empty" },
@@ -8,4 +8,4 @@ const Game = new mongoose.Schema({
   created: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("Game", Game);
+export default mongoose.model("Game", Game);

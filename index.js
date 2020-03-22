@@ -1,12 +1,13 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
 
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const api = require("./api/endpoints/routes");
+import api from "./api/endpoints/routes.js";
 
 mongoose.connect(process.env.MONGODB_CONNECTION, { useNewUrlParser: true });
 mongoose.connection.on("error", err => {

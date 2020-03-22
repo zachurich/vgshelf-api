@@ -1,6 +1,6 @@
-const fetch = require("node-fetch");
-const { createResponse, handleResponse } = require("../utils");
-const { IGDB_ENDPOINTS } = require("./constants");
+import fetch from "node-fetch";
+import { createResponse, handleResponse } from "../utils.js";
+import { IGDB_ENDPOINTS } from "./constants.js";
 
 const Search = async (req, res, next) => {
   const { title } = req.body;
@@ -28,4 +28,4 @@ search "${title}";
 limit 5;
 `;
 
-module.exports = Search;
+export default Search;

@@ -1,8 +1,7 @@
-const _ = require("lodash");
-const User = require("../../models/User");
-const Game = require("../../models/Game");
-const Collection = require("../../models/Collection");
-const { createResponse, handleResponse } = require("../utils");
+import _ from "lodash";
+import User from "../../models/User.js";
+import Game from "../../models/Game.js";
+import { createResponse, handleResponse } from "../utils.js";
 
 // {
 // 	"gameId": "" (Required)
@@ -63,4 +62,4 @@ async function removeGameFromUser(user, gameId) {
   }
 }
 
-module.exports = RemoveGame;
+export default RemoveGame;

@@ -1,7 +1,6 @@
-const _ = require("lodash");
-const User = require("../../models/User");
-const Game = require("../../models/Game");
-const { handleResponse, createResponse } = require("../utils");
+import _ from "lodash";
+import User from "../../models/User.js";
+import { handleResponse, createResponse } from "../utils.js";
 
 // {
 // 	"collectionId": "",
@@ -63,4 +62,4 @@ const createModifiedCollection = (mongoUser, games) => {
   }
 };
 
-module.exports = UpdateCollection;
+export default UpdateCollection;

@@ -5,4 +5,4 @@ const Health = (req, res) => {
   });
 };
 
-module.exports = Health;
+export default Health;

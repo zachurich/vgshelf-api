@@ -1,6 +1,6 @@
-const fetch = require("node-fetch");
-const { createResponse, handleResponse } = require("../utils");
-const { IGDB_ENDPOINTS } = require("./constants");
+import fetch from "node-fetch";
+import { createResponse, handleResponse } from "../utils.js";
+import { IGDB_ENDPOINTS } from "./constants.js";
 
 const Cover = async (req, res, next) => {
   const { gameId } = req.body; // game id
@@ -26,4 +26,4 @@ const Cover = async (req, res, next) => {
 const constructCoverQuery = gameId => `fields alpha_channel,animated,game,height,image_id,url,width;
   where game = ${gameId};`;
 
-module.exports = Cover;
+export default Cover;

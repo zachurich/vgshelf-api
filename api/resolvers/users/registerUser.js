@@ -1,6 +1,6 @@
-const User = require("../../models/User");
-const { handleResponse, createResponse, userExists } = require("../utils");
-const { ROUTES } = require("../../../common/routes");
+import User from "../../models/User.js";
+import { handleResponse, createResponse, userExists } from "../utils.js";
+import { ROUTES } from "../../../common/routes.js";
 
 const InitUser = (req, res, next) => {
   const { id, displayName, nickname } = user;
@@ -45,4 +45,4 @@ const UserResponseHandler = async (req, res, next) => {
   return handleResponse(res, response, `${ROUTES.APP}/${mongoUser.username}`);
 };
 
-module.exports = { InitUser, UserResponseHandler };
+export default { InitUser, UserResponseHandler };

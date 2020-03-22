@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const uniqueRequired = { unique: true, required: true };
 
@@ -17,4 +17,4 @@ const Collection = new mongoose.Schema({
   ]
 });
 
-module.exports = mongoose.model("Collection", Collection);
+export default mongoose.model("Collection", Collection);
