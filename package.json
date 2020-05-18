@@ -5,14 +5,22 @@
   "description": "Node API For vgshelf.co",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --experimental-modules index.js",
-    "debug": "node --experimental-modules --inspect-brk=9229 index.js"
+    "start:db": "mongod --dbpath ~/data/db",
+    "start": "nodemon -r esm -r dotenv/config index.js",
+    "serve": "node -r esm -r dotenv/config index.js",
+    "debug": "node -r esm -r dotenv/config --inspect-brk=9229 main.js",
+    "seed": "node -r esm -r dotenv/config ./scripts/seed.js",
+    "export:users": "mongoexport --collection=users --db=test --out=./backups/users.json",
+    "export:games": "mongoexport --collection=games --db=test --out=./backups/games.json",
+    "export:usergames": "mongoexport --collection=games --db=test --out=./backups/usergames.json",
+    "export": "npm run export:users && npm run export:games && npm run export:usergames"
   },
   "author": "Zach Urich",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
+    "esm": "^3.2.25",
     "express": "^4.17.1",
     "express-jwt": "^5.3.1",
     "jwks-rsa": "^1.7.0",
@@ -20,9 +28,11 @@
     "mongodb": "^3.5.3",
     "mongoose": "^5.9.1",
     "node-fetch": "^2.6.0",
-    "slugify": "^1.4.0"
+    "slugify": "^1.4.0",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
+    "mongoose-seed": "^0.6.0",
     "nodemon": "^2.0.2"
   }
 }

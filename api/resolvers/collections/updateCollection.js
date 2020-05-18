@@ -3,24 +3,29 @@ import User from "../../models/User.js";
 import { handleResponse, createResponse } from "../utils.js";
 
 // {
-// 	"collectionId": "",
+//  "userName": "",
+// 	"collectionSlug": "test2",
+// 	"newName": "Lol",
 // 	"games": [],
-// 	"newName": "" (Optional)
 // }
 
 // Expects to recieve all games in collection in request
 const UpdateCollection = async (req, res) => {
-  const { userName, collectionSlug, newName = null, games } = req.body;
+  const { userName, collectionSlug, newName = null, games = null } = req.body;
   let response = {};
   try {
     const mongoUser = await User.findOne({ username: userName });
     const updatedCollection = await updateCollection(mongoUser, collectionSlug, {
-      games: createModifiedCollection(mongoUser, games),
+      games: games ? createModifiedCollection(mongoUser, games) : null,
       name: newName
     });
     response = createResponse("Collection updated!", updatedCollection);
   } catch (error) {
-    response = createResponse("There was an error updating the collection!", error, 500);
+    response = createResponse(
+      "There was an error updating the collection!",
+      error.toString(),
+      500
+    );
   }
   return handleResponse(res, response);
 };
@@ -47,13 +52,13 @@ const updateCollection = async (mongoUser, collectionSlug, modifications) => {
 const createModifiedCollection = (mongoUser, games) => {
   const modifiedCollection = [];
   try {
-    for (const userGameId of games) {
-      const foundGame = mongoUser.games.includes(userGameId);
+    for (const game of games) {
+      const foundGame = mongoUser.games.includes(game.id);
       if (!foundGame) {
-        error = "Game not found! Won't update collection.";
+        const error = "Game not found! Won't update collection.";
         throw error;
       } else {
-        modifiedCollection.push(...mongoUser.games.filter(id => id == userGameId));
+        modifiedCollection.push(...mongoUser.games.filter(id => id == game.id));
       }
     }
     return modifiedCollection;

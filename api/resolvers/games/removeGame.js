@@ -1,7 +1,10 @@
 import _ from "lodash";
-import User from "../../models/User.js";
-import Game from "../../models/Game.js";
-import { createResponse, handleResponse } from "../utils.js";
+import User from "../../models/User";
+import Game from "../../models/Game";
+import { createResponse, handleResponse } from "../utils";
+import { createLogger } from "../../../logger/logger";
+
+const logger = createLogger(__filename);
 
 // {
 // 	"gameId": "" (Required)
@@ -26,7 +29,7 @@ const RemoveGame = async (req, res, next) => {
       }
     } else {
       const users = await User.find();
-      users.forEach(async user => {
+      users.forEach(async (user) => {
         await removeGameFromUser(user, gameId);
       });
       const { deletedCount } = await Game.deleteOne({ _id: gameId });
@@ -36,17 +39,21 @@ const RemoveGame = async (req, res, next) => {
       );
     }
   } catch (e) {
-    response = createResponse("There was an error removing the game!", e, 500);
+    response = createResponse(
+      "There was an error removing the game!",
+      error.toString(),
+      500
+    );
   }
   return handleResponse(res, response);
 };
 
 async function removeGameFromCollections(user, gameId) {
-  user.collections.forEach(async shelf => {
+  user.collections.forEach(async (shelf) => {
     const foundShelfGame = shelf.games.includes(gameId);
     if (foundShelfGame) {
-      shelf.games = shelf.games.filter(id => id != gameId);
-      console.log(`Removed game from shelf ${shelf.name}`);
+      shelf.games = shelf.games.filter((id) => id != gameId);
+      logger.info(`Removed game from shelf ${shelf.name}`);
     }
   });
   await user.save();
@@ -55,8 +62,8 @@ async function removeGameFromCollections(user, gameId) {
 async function removeGameFromUser(user, gameId) {
   const foundGame = user.games.includes(gameId);
   if (foundGame) {
-    user.games = user.games.filter(id => id != gameId);
-    console.log(`Removed game from ${user.username}`);
+    user.games = user.games.filter((id) => id != gameId);
+    logger.info(`Removed game from ${user.username}`);
     await user.save();
     return true;
   }

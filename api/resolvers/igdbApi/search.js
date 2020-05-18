@@ -3,29 +3,39 @@ import { createResponse, handleResponse } from "../utils.js";
 import { IGDB_ENDPOINTS } from "./constants.js";
 
 const Search = async (req, res, next) => {
-  const { title } = req.body;
+  const { title, limit = 5 } = req.body;
   let response;
-  const query = searchTitleQuery(title);
+  const body = createSearchQuery(title, limit);
   try {
-    let results = await fetch(IGDB_ENDPOINTS.GAMES, {
-      method: "POST",
-      headers: {
-        "user-key": process.env.IGDB_KEY
-      },
-      body: query
-    });
-    const data = await results.json();
+    const data = await fetchGames(body);
     response = createResponse("Results found!", data);
   } catch (e) {
-    response = createResponse("Failed to fetch results from IGDB!", e, 500);
+    response = createResponse(
+      "Failed to fetch results from IGDB!",
+      error.toString(),
+      500
+    );
   }
   return handleResponse(res, response);
 };
 
-const searchTitleQuery = title => `
+export const fetchGames = async (body) => {
+  let results = await fetch(IGDB_ENDPOINTS.GAMES, {
+    method: "POST",
+    headers: {
+      "user-key": process.env.IGDB_KEY,
+    },
+    body,
+  });
+
+  const data = await results.json();
+  return data;
+};
+
+export const createSearchQuery = (title, limit = 5) => `
 fields id, slug, name, platforms.name, summary, cover, artworks;
 search "${title}"; 
-limit 5;
+limit ${limit};
 `;
 
 export default Search;

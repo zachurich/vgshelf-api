@@ -12,6 +12,7 @@ import Search from "../resolvers/igdbApi/search.js";
 import Cover from "../resolvers/igdbApi/cover.js";
 import { apiBase } from "./constants.js";
 import { jwtCheck } from "../../common/globalUtils.js";
+import Register from "../resolvers/users/registerUser.js";
 
 const api = express.Router();
 
@@ -32,5 +33,8 @@ api.delete(`${apiBase}/collection`, jwtCheck, DeleteCollection);
 /** igdb stuff */
 api.post(`${apiBase}/external/search/`, Search);
 api.post(`${apiBase}/external/cover/`, Cover);
+
+/** users */
+api.post(`${apiBase}/user/register`, Register);
 
 export default api;

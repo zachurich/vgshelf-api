@@ -2,47 +2,37 @@ import User from "../../models/User.js";
 import { handleResponse, createResponse, userExists } from "../utils.js";
 import { ROUTES } from "../../../common/routes.js";
 
-const InitUser = (req, res, next) => {
-  const { id, displayName, nickname } = user;
-  const mongoUser = new User({
-    userId: id,
-    username: nickname,
-    emailAddress: displayName
-  });
-  if (err) return next(err);
-  if (!user) return res.redirect(ROUTES.LOGIN);
-  req.logIn(user, err => {
-    if (err) return next(err);
-    req.mongoUser = mongoUser;
-    userExists(id, req, res, next);
-  });
-};
+const Register = async (req, res, next) => {
+  const { userId, username, emailAddress } = req.body;
+  let response;
+  try {
+    const exists = await userExists(userId);
+    if (exists) {
+      response = createResponse(`${username} already exists!`, username, 409);
+    } else {
+      const mongoUser = new User({
+        userId,
+        username,
+        emailAddress,
+      });
 
-const UserResponseHandler = async (req, res, next) => {
-  const { mongoUser, userExists } = req;
-  if (!userExists) {
-    try {
       await mongoUser.save();
+
       response = createResponse(
         `Created user ${mongoUser.username}!`,
         mongoUser.username,
         200
       );
-    } catch (e) {
-      response = createResponse(
-        `There was an error registering user ${mongoUser.username}`,
-        e,
-        500
-      );
     }
-  } else {
+  } catch (error) {
     response = createResponse(
-      `Logging in ${mongoUser.username}!`,
-      mongoUser.username,
-      200
+      `There was an error checking or creating user ${username}`,
+      { ...error, userId, username, emailAddress },
+      500
     );
   }
-  return handleResponse(res, response, `${ROUTES.APP}/${mongoUser.username}`);
+
+  return handleResponse(res, response);
 };
 
-export default { InitUser, UserResponseHandler };
+export default Register;

@@ -6,24 +6,31 @@ const Cover = async (req, res, next) => {
   const { gameId } = req.body; // game id
 
   let response;
-  const query = constructCoverQuery(gameId);
+  const query = createCoverQuery(gameId);
   try {
-    let results = await fetch(IGDB_ENDPOINTS.COVERS, {
-      method: "POST",
-      headers: {
-        "user-key": process.env.IGDB_KEY
-      },
-      body: query
-    });
-    const data = await results.json();
+    const data = await fetchCover(query);
     response = createResponse("Cover found!", data);
   } catch (e) {
-    response = createResponse("Failed to cover from IGDB!", e, 500);
+    response = createResponse("Failed to cover from IGDB!", error.toString(), 500);
   }
   return handleResponse(res, response);
 };
 
-const constructCoverQuery = gameId => `fields alpha_channel,animated,game,height,image_id,url,width;
+export const fetchCover = async (body) => {
+  const results = await fetch(IGDB_ENDPOINTS.COVERS, {
+    method: "POST",
+    headers: {
+      "user-key": process.env.IGDB_KEY,
+    },
+    body,
+  });
+  const data = await results.json();
+  return data;
+};
+
+export const createCoverQuery = (
+  gameId
+) => `fields alpha_channel,animated,game,height,image_id,url,width;
   where game = ${gameId};`;
 
 export default Cover;

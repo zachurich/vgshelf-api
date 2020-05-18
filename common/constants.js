@@ -15,3 +15,7 @@ export const COMPLETENESS = {
 export const IMAGES = {
   MISSING: "/static/missing-thumb.png"
 };
+
+export const ERRORS = {
+  NO_USER: "User does not exist!"
+};

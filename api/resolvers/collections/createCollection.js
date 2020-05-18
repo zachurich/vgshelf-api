@@ -1,6 +1,6 @@
-import slugify from "slugify";
+import { createResponse, handleResponse } from "../utils.js";
+
 import User from "../../models/User.js";
-import { handleResponse, createResponse } from "../utils.js";
 
 const CreateCollection = async (req, res) => {
   const { userId, collectionName, games = [] } = req.body;
@@ -9,13 +9,16 @@ const CreateCollection = async (req, res) => {
   try {
     user.collections.push({
       name: collectionName,
-      slug: slugify(collectionName.toLowerCase()),
-      games
+      games,
     });
     const data = await user.save();
     response = createResponse("Collection created!", data);
-  } catch (e) {
-    response = createResponse("There was an error creating the collection!", e, 500);
+  } catch (error) {
+    response = createResponse(
+      "There was an error creating the collection!",
+      error.toString(),
+      500
+    );
   }
   return handleResponse(res, response);
 };

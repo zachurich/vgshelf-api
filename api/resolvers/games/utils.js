@@ -7,3 +7,12 @@ export const objectHasGame = (obj, game) => {
 export const addGameToObj = (obj, game) => {
   return obj.games.push(game);
 };
+
+export const createGameObj = ({ title, igdbId, slug, imageUrl }) => {
+  return {
+    title,
+    igdbId,
+    slug,
+    imageUrl,
+  };
+};

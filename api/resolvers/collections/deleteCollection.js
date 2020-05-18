@@ -18,7 +18,11 @@ const DeleteCollection = async (req, res) => {
     }
     response = createResponse("Collection deleted!", {});
   } catch (error) {
-    response = createResponse("There was an error deleting the collection!", error, 500);
+    response = createResponse(
+      "There was an error deleting the collection!",
+      error.toString(),
+      500
+    );
   }
   return handleResponse(res, response);
 };

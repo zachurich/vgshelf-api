@@ -1,17 +1,20 @@
 import User from "../models/User.js";
+import { createLogger } from "../../logger/logger.js";
+
+const logger = createLogger();
 
 export const createResponse = (msg, data, code = 200) => {
   return {
     msg,
     data,
-    code
+    code,
   };
 };
 
 export const handleResponse = (res, response, redirect = false) => {
   const { code } = response;
   if (code >= 500 && code < 600) {
-    console.log(response);
+    logger.error(response);
     res.status(code);
   }
 
@@ -22,23 +25,12 @@ export const handleResponse = (res, response, redirect = false) => {
   }
 };
 
-export const userExists = (userId, req, res, next) => {
-  User.findOne({ userId }, (err, obj) => {
-    req.userId = userId;
-    if (err) {
-      req.userExists = false;
-      next();
-    }
-    if (obj) {
-      req.userExists = true;
-    } else {
-      req.userExists = false;
-    }
-    next();
-  });
+export const userExists = async (userId) => {
+  const existingUser = await User.findOne({ userId });
+  return !!existingUser;
 };
 
-export const handleErrors = async fn => {
+export const handleErrors = async (fn) => {
   try {
     const response = await fn;
     return response;
@@ -48,7 +40,6 @@ export const handleErrors = async fn => {
 };
 
 export const checkAuthentication = (req, res, next) => {
-  console.log(req.get("host"));
   if (req.get("host").includes("/api") && !req.isAuthenticated()) {
     res.status(401);
     return res.send(
