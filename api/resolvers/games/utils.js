@@ -16,3 +16,12 @@ export const createGameObj = ({ title, igdbId, slug, imageUrl }) => {
     imageUrl,
   };
 };
+
+export const createUserGameResponse = ({ title, properties, slug, added }) => {
+  return {
+    title,
+    properties,
+    slug,
+    added,
+  };
+};

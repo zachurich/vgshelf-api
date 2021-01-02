@@ -1,9 +1,9 @@
-import express from "express";
+import api from "./api/endpoints/routes";
 import bodyParser from "body-parser";
 import cors from "cors";
-import mongoose from "mongoose";
-import api from "./api/endpoints/routes";
 import { createLogger } from "./logger/logger";
+import express from "express";
+import mongoose from "mongoose";
 
 const logger = createLogger(__filename);
 
@@ -11,11 +11,12 @@ mongoose.connect(process.env.MONGODB_CONNECTION, {
   useNewUrlParser: true,
   useCreateIndex: true,
 });
+
 mongoose.connection.on("error", (err) => {
   logger.log(`Error connecting to db: ${err}`);
 });
 
-const init = () => {
+const init = async () => {
   try {
     const server = express();
 

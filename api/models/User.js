@@ -55,7 +55,8 @@ UserSchema.pre("save", async function (next) {
   for (const shelf of this.collections) {
     if (shelf.isNew) {
       const existingShelvesSameName = this.collections.filter(
-        (existing) => !existing.isNew && existing.name === shelf.name
+        (existing) =>
+          !existing.isNew && existing.name.toLowerCase() === shelf.name.toLowerCase()
       );
       shelf.slug = slugify(shelf.name.toLowerCase());
       if (existingShelvesSameName.length > 0) {

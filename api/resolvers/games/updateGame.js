@@ -1,28 +1,21 @@
-import { addGameToObj, createGameObj, objectHasGame } from "./utils.js";
-import { createResponse, handleErrors, handleResponse } from "../utils.js";
+import { createResponse, handleResponse } from "../utils.js";
 
-import Collection from "../../models/Collection.js";
-import Game from "../../models/Game.js";
-import User from "../../models/User.js";
 import UserGame from "../../models/UserGame.js";
+import _ from "lodash";
+import { createUserGameResponse } from "./utils.js";
 
 // {
-// 	"userId": "auth0|5d50aaee46c9270eb3b3441d",
-// 	"title": "Mario & Luigi: Dream Team",
-// 	"slug": "mario-luigi-dream-team",
-//  "properties": {}
+// 	"gameSlug": "super-mario-brothers",
+// 	"properties": {},
 // }
 const UpdateGame = async (req, res, next) => {
-  const { gameId, title, userId, properties = {} } = req.body;
+  const { gameSlug, properties = {} } = req.body;
   let response;
   try {
-    const gameObj = createGameObj({ title, igdbId, slug, imageUrl });
-    const gameToAdd = await handleErrors(optionallyAddGameToDb(gameObj));
-    if (collectionId) {
-      response = await handleErrors(addGameToCollection(collectionId, gameToAdd));
-    }
-    response = await handleErrors(addGameToUser(userId, gameToAdd, properties));
-  } catch (e) {
+    const userGame = await UserGame.findOne({ slug: gameSlug });
+    const response = await updateUserGame(userGame, properties);
+    return response;
+  } catch (error) {
     response = createResponse(
       "There was an error saving the game!",
       error.toString(),
@@ -30,6 +23,22 @@ const UpdateGame = async (req, res, next) => {
     );
   }
   return handleResponse(res, response);
+};
+
+const updateUserGame = async (userGame, properties) => {
+  let response;
+  if (userGame && !_.isEmpty(properties)) {
+    for (const property in properties) {
+      if (properties[property]) {
+        userGame.properties[property] = properties[property];
+      }
+    }
+    const data = await userGame.save();
+    response = createResponse(`Updated ${userGame.title}.`, createUserGameResponse(data));
+  } else {
+    response = createResponse(`Could not find a game with slug ${gameSlug}.`, {}, 400);
+  }
+  return response;
 };
 
 export default UpdateGame;

@@ -22,13 +22,20 @@ const UserGameSchema = new mongoose.Schema({
     default: Date.now,
   },
   properties: {
+    type: {
+      type: String,
+      enum: ["Digital", "Physical"],
+      // default: null,
+    },
     packaging: {
       type: String,
-      enum: Object.keys(PACKAGING).map((key) => PACKAGING[key]),
+      enum: ["Game Only", "Case", "Case/Manual", "Sealed"],
+      // default: null,
     },
     completeness: {
       type: String,
-      enum: Object.keys(COMPLETENESS).map((key) => COMPLETENESS[key]),
+      enum: ["Started", "Beaten", "Completed"],
+      // default: null,
     },
     quantity: {
       type: Number,
@@ -47,18 +54,20 @@ const UserGameSchema = new mongoose.Schema({
 });
 
 UserGameSchema.pre("save", async function (next) {
-  const gameRef = await Game.findOne({ _id: this.refId });
+  if (this.isNew) {
+    const gameRef = await Game.findOne({ _id: this.refId });
 
-  // find existing instances, so we can have some unique identifier for `slug`
-  const existingGames = await UserGame.find({ title: gameRef.title });
-  let slug = gameRef.slug;
-  if (existingGames.length > 0) {
-    slug += `-${existingGames.length + 1}`;
+    // find existing instances, so we can have some unique identifier for `slug`
+    const existingGames = await UserGame.find({ title: gameRef.title });
+    let slug = gameRef.slug;
+    if (existingGames.length > 0) {
+      slug += `-${existingGames.length + 1}`;
+    }
+
+    this.title = gameRef.title;
+    this.slug = slug;
+    next();
   }
-
-  this.title = gameRef.title;
-  this.slug = slug;
-  next();
 });
 
 const UserGame = mongoose.model("UserGame", UserGameSchema);

@@ -1,16 +1,11 @@
-import _ from "lodash";
-import User from "../../models/User.js";
-import Game from "../../models/Game.js";
-import UserGame from "../../models/UserGame.js";
+import { createResponse, handleErrors, handleResponse } from "../utils.js";
 
-import {
-  handleResponse,
-  createResponse,
-  handleErrors
-} from "../utils.js";
-import {
-  ERRORS
-} from "../../../common/constants.js";
+import { ERRORS } from "../../../common/constants.js";
+import Game from "../../models/Game.js";
+import User from "../../models/User.js";
+import UserGame from "../../models/UserGame.js";
+import _ from "lodash";
+import { createUserGameResponse } from "./utils.js";
 
 /**
  * @field gameId (Required)- Game Unique ID from mongo collection
@@ -20,31 +15,23 @@ import {
  * @field userName (Optional) - Username for user in mongodb
  */
 const GetGame = async (req, res) => {
-  const {
-    gameId,
-    userName,
-    userId = null,
-    collectionSlug = null
-  } = req.query;
+  const { gameSlug, userName, userId = null, collectionSlug = null } = req.query;
   let response = {};
   let query;
-
   try {
-    const mongoUser = await User.findOne(userName ? {
-      username: userName
-    } : {
-      userId
-    });
+    // Get a single game by _id
+    if (gameSlug) {
+      response = await handleErrors(
+        retrieveSingleGame({
+          slug: gameSlug,
+        })
+      );
+      return handleResponse(res, response);
+    }
+
+    const mongoUser = await User.findOne(userName ? { username: userName } : { userId });
     if (!mongoUser) {
       throw Error(ERRORS.NO_USER);
-    }
-    // Get a single game by _id
-    if (gameId) {
-      query = {
-        _id: gameId
-      };
-      response = await handleErrors(retrieveSingleGame(query));
-      return handleResponse(res, response);
     }
 
     if (!collectionSlug) {
@@ -73,7 +60,7 @@ async function buildQueryGamesInCollection(mongoUser, collectionSlug) {
   return {
     queryObject: collection,
     type,
-    user: mongoUser
+    user: mongoUser,
   };
 }
 
@@ -82,43 +69,43 @@ async function buildQueryGamesByUsername(mongoUser) {
   return {
     queryObject: mongoUser,
     type,
-    user: mongoUser
+    user: mongoUser,
   };
 }
 
 async function retrieveSingleGame(filter) {
-  const game = await Game.findOne(filter);
-  return createResponse("Retrieved single game!", game);
+  const userGame = await UserGame.findOne(filter);
+  let globalGame = await Game.findOne({
+    _id: userGame.refId,
+  });
+  return createResponse(
+    "Retrieved single game!",
+    createDetailedGame(globalGame, userGame)
+  );
 }
 
-async function retrieveAllGames({
-  queryObject,
-  type,
-  user
-}) {
-  const {
-    games
-  } = queryObject;
+async function retrieveAllGames({ queryObject, type, user }) {
+  const { games } = queryObject;
   let gameDetails = [];
   try {
     gameDetails = await composeGameDetails(games);
     return createResponse(`Retrieved all games from ${type}!`, {
       username: user.username,
-      games: _.uniqBy(gameDetails, "id")
+      games: _.uniqBy(gameDetails, "id"),
     });
   } catch (error) {
     throw Error("Could not retrieve game data!", error);
   }
 }
 
-export const composeGameDetails = async games => {
+export const composeGameDetails = async (games) => {
   let gameDetails = [];
   for (const userGameId of games) {
     let userGame = await UserGame.findOne({
-      _id: userGameId
+      _id: userGameId,
     });
     let globalGame = await Game.findOne({
-      _id: userGame.refId
+      _id: userGame.refId,
     });
     gameDetails.push(createDetailedGame(globalGame, userGame));
   }
@@ -131,7 +118,8 @@ export const createDetailedGame = (globalGame, userGame) => {
     title: globalGame.title,
     imageUrl: globalGame.imageUrl,
     added: userGame.added,
-    properties: userGame.properties
+    properties: userGame.properties,
+    slug: userGame.slug,
   };
 };
 

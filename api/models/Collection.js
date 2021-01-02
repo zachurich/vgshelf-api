@@ -1,10 +1,5 @@
 import mongoose from "mongoose";
 
-const uniqueRequired = {
-  unique: true,
-  required: true,
-};
-
 const Collection = new mongoose.Schema({
   user: {
     type: mongoose.Types.ObjectId,

@@ -3,3 +3,4 @@ node_modules
 scripts/*.md
 backups/*
 *.log
+*.sql

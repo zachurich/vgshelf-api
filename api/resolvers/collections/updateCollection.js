@@ -1,6 +1,7 @@
-import _ from "lodash";
+import { createResponse, handleResponse } from "../utils.js";
+
 import User from "../../models/User.js";
-import { handleResponse, createResponse } from "../utils.js";
+import _ from "lodash";
 
 // {
 //  "userName": "",
@@ -17,7 +18,7 @@ const UpdateCollection = async (req, res) => {
     const mongoUser = await User.findOne({ username: userName });
     const updatedCollection = await updateCollection(mongoUser, collectionSlug, {
       games: games ? createModifiedCollection(mongoUser, games) : null,
-      name: newName
+      name: newName,
     });
     response = createResponse("Collection updated!", updatedCollection);
   } catch (error) {
@@ -33,8 +34,9 @@ const UpdateCollection = async (req, res) => {
 const updateCollection = async (mongoUser, collectionSlug, modifications) => {
   try {
     const collection = _.find(mongoUser.collections, ["slug", collectionSlug]);
-    Object.keys(modifications).forEach(key => {
+    Object.keys(modifications).forEach((key) => {
       if (modifications[key]) {
+        console.log(collection);
         collection.set(key, modifications[key]);
       }
     });
@@ -58,7 +60,7 @@ const createModifiedCollection = (mongoUser, games) => {
         const error = "Game not found! Won't update collection.";
         throw error;
       } else {
-        modifiedCollection.push(...mongoUser.games.filter(id => id == game.id));
+        modifiedCollection.push(...mongoUser.games.filter((id) => id == game.id));
       }
     }
     return modifiedCollection;

@@ -1,7 +1,6 @@
 {
   "name": "vgshelf-api",
   "version": "1.0.0",
-  "type": "module",
   "description": "Node API For vgshelf.co",
   "main": "index.js",
   "scripts": {
@@ -28,6 +27,7 @@
     "mongodb": "^3.5.3",
     "mongoose": "^5.9.1",
     "node-fetch": "^2.6.0",
+    "pg": "^8.5.1",
     "slugify": "^1.4.0",
     "winston": "^3.2.1"
   },

@@ -1,18 +1,19 @@
-import User from "../../models/User.js";
-import { handleResponse, createResponse, userExists } from "../utils.js";
+import { createResponse, handleResponse, userExists } from "../utils.js";
+
 import { ROUTES } from "../../../common/routes.js";
+import User from "../../models/User.js";
 
 const Register = async (req, res, next) => {
-  const { userId, username, emailAddress } = req.body;
+  const { userId, userName, emailAddress } = req.body;
   let response;
   try {
-    const exists = await userExists(userId);
+    const { exists } = await userExists(userId);
     if (exists) {
-      response = createResponse(`${username} already exists!`, username, 409);
+      response = createResponse(`${userName} already exists!`, userName, 409);
     } else {
       const mongoUser = new User({
         userId,
-        username,
+        username: userName,
         emailAddress,
       });
 
@@ -26,8 +27,8 @@ const Register = async (req, res, next) => {
     }
   } catch (error) {
     response = createResponse(
-      `There was an error checking or creating user ${username}`,
-      { ...error, userId, username, emailAddress },
+      `There was an error checking or creating user ${userName}`,
+      { ...error, userId, userName, emailAddress },
       500
     );
   }

@@ -1,26 +1,29 @@
-import fetch from "node-fetch";
 import { createResponse, handleResponse } from "../utils.js";
+
 import { IGDB_ENDPOINTS } from "./constants.js";
+import fetch from "node-fetch";
 
 const Cover = async (req, res, next) => {
   const { gameId } = req.body; // game id
+  const { igdbAuthToken } = req.app.locals;
 
   let response;
   const query = createCoverQuery(gameId);
   try {
-    const data = await fetchCover(query);
+    const data = await fetchCover(query, igdbAuthToken);
     response = createResponse("Cover found!", data);
-  } catch (e) {
+  } catch (error) {
     response = createResponse("Failed to cover from IGDB!", error.toString(), 500);
   }
   return handleResponse(res, response);
 };
 
-export const fetchCover = async (body) => {
+export const fetchCover = async (body, accessToken) => {
   const results = await fetch(IGDB_ENDPOINTS.COVERS, {
     method: "POST",
     headers: {
-      "user-key": process.env.IGDB_KEY,
+      "Client-ID": process.env.IGDB_CLIENT_ID,
+      Authorization: `Bearer ${accessToken}`,
     },
     body,
   });

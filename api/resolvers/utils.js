@@ -27,7 +27,10 @@ export const handleResponse = (res, response, redirect = false) => {
 
 export const userExists = async (userId) => {
   const existingUser = await User.findOne({ userId });
-  return !!existingUser;
+  return {
+    exists: !!existingUser,
+    userName: existingUser ? existingUser.username : null,
+  };
 };
 
 export const handleErrors = async (fn) => {
